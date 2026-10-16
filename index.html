@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مُزيل خلفية الصور الذكي</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Tajawal', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f5ff',
+                            100: '#e5edff',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* خلفية ناعمة وعصرية للصور الشفافة */
+        .transparent-bg {
+            background-color: rgba(15, 23, 42, 0.6);
+        }
+
+        /* تحسين السحب والإسقاط */
+        .drag-over {
+            border-color: #2563eb !important;
+            background-color: #eff6ff !important;
+            transform: scale(1.01);
+        }
+
+        /* أنيميشن التمرير السلس */
+        .smooth-transition {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* تأثير نبض التحميل */
+        @keyframes scanner {
+            0% { top: 0%; }
+            50% { top: 100%; }
+            100% { top: 0%; }
+        }
+        .scan-line {
+            position: absolute;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, #3b82f6, transparent);
+            box-shadow: 0 0 15px #3b82f6;
+            animation: scanner 2.5s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen font-sans flex flex-col justify-between selection:bg-brand-500 selection:text-white">
+
+    <!-- Header -->
+    <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/20">
+                    <i class="fa-solid font-bold fa-wand-magic-sparkles text-white text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
+                        مُزيل الخلفية الذكي
+                    </h1>
+                    <p class="text-xs text-slate-400">إزالة خلفية الصور بدقة وبضغطة زر</p>
+                </div>
+            </div>
+
+            <div class="hidden md:flex items-center gap-6 text-sm text-slate-400">
+                <span class="flex items-center gap-2"><i class="fa-solid fa-bolt text-amber-400"></i> معالجة سريعة</span>
+                <span class="flex items-center gap-2"><i class="fa-solid fa-shield-halved text-emerald-400"></i> آمن ومجاني</span>
+                <span class="flex items-center gap-2"><i class="fa-solid fa-gem text-indigo-400"></i> جودة عالية</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 py-8 flex-grow w-full flex flex-col items-center justify-center">
+
+        <!-- Banner Announcement -->
+        <div class="text-center mb-8 max-w-2xl">
+            <h2 class="text-3xl sm:text-4xl font-black text-white mb-3 leading-tight">
+                انزع خلفية أي صورة <span class="bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">في ثوانٍ معدودة</span>
+            </h2>
+            <p class="text-slate-400 text-sm sm:text-base">
+                قم برفع صورتك واحتفظ بالعنصر الأساسي فقط خلفية شفافة بجودة عالية جاهزة للتحميل المباشر بصيغة PNG.
+            </p>
+        </div>
+
+        <!-- Upload Box Area -->
+        <div id="uploadContainer" class="w-full max-w-2xl bg-slate-800/60 border-2 border-dashed border-slate-700 hover:border-brand-500 rounded-3xl p-8 sm:p-12 text-center transition-all duration-300 backdrop-blur-xl relative group cursor-pointer shadow-2xl">
+            <input type="file" id="fileInput" accept="image/png, image/jpeg, image/webp" class="hidden">
+            
+            <div class="flex flex-col items-center justify-center gap-4">
+                <div class="w-20 h-20 rounded-full bg-slate-700/50 flex items-center justify-center group-hover:scale-110 group-hover:bg-brand-500/20 text-brand-500 transition-all duration-300">
+                    <i class="fa-solid fa-cloud-arrow-up text-3xl"></i>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-bold text-white mb-1">اسحب الصورة وأسقطها هنا</h3>
+                    <p class="text-slate-400 text-sm mb-4">أو انقر لاختيار ملف من جهازك</p>
+                    <span class="inline-flex items-center gap-2 text-xs text-slate-500 bg-slate-800 px-3 py-1.5 rounded-full border border-slate-700">
+                        <i class="fa-regular fa-image"></i> يدعم PNG, JPG, WEBP
+                    </span>
+                </div>
+
+                <button type="button" onclick="document.getElementById('fileInput').click()" class="mt-2 px-8 py-3.5 bg-brand-600 hover:bg-brand-500 active:scale-95 text-white font-medium rounded-xl shadow-lg shadow-brand-600/30 transition-all duration-200 flex items-center gap-2">
+                    <i class="fa-solid fa-plus"></i> اختر صورة
+                </button>
+            </div>
+        </div>
+
+        <!-- Processing State (Hidden initially) -->
+        <div id="processingState" class="hidden w-full max-w-2xl bg-slate-800/80 rounded-3xl p-8 text-center border border-slate-700 backdrop-blur-xl shadow-2xl">
+            <div class="relative w-full max-h-[350px] overflow-hidden rounded-2xl mb-6 bg-slate-950 flex items-center justify-center">
+                <img id="previewImageProcessing" src="" alt="جاري المعالجة" class="max-h-[350px] w-auto object-contain opacity-70">
+                <div class="scan-line"></div>
+            </div>
+
+            <div class="flex flex-col items-center gap-3">
+                <div class="flex items-center gap-3 text-brand-400 font-semibold text-lg">
+                    <i class="fa-solid fa-circle-notch fa-spin text-2xl"></i>
+                    <span>جاري إزالة الخلفية باستخدام الذكاء الاصطناعي...</span>
+                </div>
+                <p class="text-xs text-slate-400">قد تستغرق العملية بضع ثوانٍ للحصول على أفضل دقة</p>
+            </div>
+        </div>
+
+        <!-- Result View (Hidden initially) -->
+        <div id="resultState" class="hidden w-full max-w-4xl bg-slate-800/80 rounded-3xl p-6 sm:p-8 border border-slate-700 backdrop-blur-xl shadow-2xl flex flex-col gap-6">
+            
+            <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-700/60 pb-4">
+                <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 bg-emerald-500 rounded-full animate-pulse"></span>
+                    <h3 class="text-lg font-bold text-white">تمت إزالة الخلفية بنجاح!</h3>
+                </div>
+
+                <!-- Customization background tools -->
+                <div class="flex items-center gap-2 bg-slate-900/80 p-1.5 rounded-xl border border-slate-700/50">
+                    <button onclick="setBgStyle('transparent')" id="bgTransBtn" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-brand-600 text-white transition-all">
+                        شفاف
+                    </button>
+                    <button onclick="setBgStyle('white')" id="bgWhiteBtn" class="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition-all">
+                        أبيض
+                    </button>
+                    <button onclick="setBgStyle('black')" id="bgBlackBtn" class="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition-all">
+                        أسود
+                    </button>
+                    <input type="color" id="bgColorPicker" onchange="setBgCustomColor(this.value)" class="w-6 h-6 rounded cursor-pointer border-0 bg-transparent" title="اختر لون خلفية">
+                </div>
+            </div>
+
+            <!-- Image Comparison Area -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                <!-- Original Image -->
+                <div class="flex flex-col gap-2">
+                    <span class="text-xs font-medium text-slate-400 flex items-center gap-1.5">
+                        <i class="fa-regular fa-image"></i> الصورة الأصلية
+                    </span>
+                    <div class="bg-slate-950 rounded-2xl overflow-hidden border border-slate-700/50 h-[300px] flex items-center justify-center p-2">
+                        <img id="originalImgDisplay" class="max-h-full max-w-full object-contain rounded-lg" src="" alt="الصورة الأصلية">
+                    </div>
+                </div>
+
+                <!-- Result Image -->
+                <div class="flex flex-col gap-2">
+                    <span class="text-xs font-medium text-emerald-400 flex items-center gap-1.5">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> الصورة الشفافة
+                    </span>
+                    <div id="resultImgContainer" class="bg-slate-950/80 rounded-2xl overflow-hidden border border-slate-700/50 h-[300px] flex items-center justify-center p-2 relative">
+                        <img id="resultImgDisplay" class="max-h-full max-w-full object-contain drop-shadow-lg" src="" alt="الصورة النهائية الشفافة">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-slate-700/60">
+                <button onclick="resetApp()" class="w-full sm:w-auto px-6 py-3 bg-slate-700 hover:bg-slate-600 active:scale-95 text-slate-200 font-medium rounded-xl transition-all duration-200 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-rotate-right"></i> رفع صورة أخرى
+                </button>
+
+                <a id="downloadBtn" download="image_without_bg.png" class="w-full sm:w-auto px-8 py-3.5 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-bold rounded-xl shadow-lg shadow-emerald-600/30 transition-all duration-200 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-download text-lg"></i> تحميل الصورة الشفافة (PNG)
+                </a>
+            </div>
+        </div>
+
+        <!-- Error Alert -->
+        <div id="errorAlert" class="hidden w-full max-w-2xl mt-4 bg-rose-500/10 border border-rose-500/30 rounded-2xl p-4 text-rose-300 text-sm flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <i class="fa-solid fa-triangle-exclamation text-xl text-rose-400"></i>
+                <span id="errorMessage">حدث خطأ أثناء معالجة الصورة. يرجى المحاولة مرة أخرى.</span>
+            </div>
+            <button onclick="hideError()" class="text-rose-400 hover:text-rose-200">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800 bg-slate-950 py-6 text-center text-xs text-slate-500">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p>© 2026 جميع الحقوق محفوظة - مُزيل الخلفية الذكي</p>
+            <p class="flex items-center gap-1">
+                تم التطوير باستخدام أحدث تقنيات الذكاء الاصطناعي <i class="fa-solid fa-heart text-rose-500"></i>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // العناصر المرجعية من الواجهة
+        const fileInput = document.getElementById('fileInput');
+        const uploadContainer = document.getElementById('uploadContainer');
+        const processingState = document.getElementById('processingState');
+        const resultState = document.getElementById('resultState');
+        const previewImageProcessing = document.getElementById('previewImageProcessing');
+        const originalImgDisplay = document.getElementById('originalImgDisplay');
+        const resultImgDisplay = document.getElementById('resultImgDisplay');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const errorAlert = document.getElementById('errorAlert');
+        const errorMessage = document.getElementById('errorMessage');
+        const resultImgContainer = document.getElementById('resultImgContainer');
+
+        let currentProcessedBase64 = null;
+
+        // أحداث السحب والإسقاط
+        ['dragenter', 'dragover'].forEach(eventName => {
+            uploadContainer.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                uploadContainer.classList.add('drag-over');
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            uploadContainer.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                uploadContainer.classList.remove('drag-over');
+            }, false);
+        });
+
+        uploadContainer.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            if (files.length > 0) {
+                handleFileSelect(files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFileSelect(e.target.files[0]);
+            }
+        });
+
+        // معالجة اختيار الملف
+        function handleFileSelect(file) {
+            if (!file.type.startsWith('image/')) {
+                showError('يرجى اختيار ملف صورة صالحة (PNG, JPG, WEBP).');
+                return;
+            }
+
+            // التحقق من حجم الملف (أقل من 10 ميجابايت)
+            if (file.size > 10 * 1024 * 1024) {
+                showError('حجم الصورة كبير جداً. يرجى اختيار صورة حجمها أقل من 10 ميجابايت.');
+                return;
+            }
+
+            hideError();
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64Image = e.target.result;
+                startProcessing(base64Image);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // بدء عملية المعالجة وتحديث الشاشة
+        function startProcessing(base64Image) {
+            uploadContainer.classList.add('hidden');
+            resultState.classList.add('hidden');
+            processingState.classList.remove('hidden');
+
+            previewImageProcessing.src = base64Image;
+            originalImgDisplay.src = base64Image;
+
+            // إرسال الصورة إلى Gemini AI لإزالة الخلفية
+            removeBackgroundWithGemini(base64Image);
+        }
+
+        // استدعاء Gemini API لإزالة الخلفية
+        async function removeBackgroundWithGemini(base64Data) {
+            const apiKey = ""; // سيتم تزويده من بيئة التشغيل تلقائياً
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image:generateContent?key=${apiKey}`;
+
+            // تجهيز البيانات للصورة (إزالة التنسيق المسبق مثل data:image/png;base64,)
+            const mimeType = base64Data.substring(base64Data.indexOf(":") + 1, base64Data.indexOf(";"));
+            const cleanBase64 = base64Data.split(',')[1];
+
+            const prompt = "Isolate the main subject from this image and completely remove the background. Return ONLY the isolated main subject on a transparent background with no other elements or artifacts.";
+
+            const payload = {
+                contents: [
+                    {
+                        role: "user",
+                        parts: [
+                            { text: prompt },
+                            {
+                                inlineData: {
+                                    mimeType: mimeType,
+                                    data: cleanBase64
+                                }
+                            }
+                        ]
+                    }
+                ],
+                generationConfig: {
+                    responseModalities: ['IMAGE']
+                }
+            };
+
+            let attempts = 0;
+            const maxAttempts = 3;
+            let delay = 1000;
+
+            async function makeApiCall() {
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    const part = result?.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
+
+                    if (part && part.inlineData) {
+                        const resultBase64 = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+                        finishProcessing(resultBase64);
+                    } else {
+                        throw new Error("لم يتم تلقي صورة صحيحة من الذكاء الاصطناعي.");
+                    }
+                } catch (err) {
+                    if (attempts < maxAttempts - 1) {
+                        attempts++;
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        delay *= 2; // exponential backoff
+                        return makeApiCall();
+                    } else {
+                        console.error("Gemini Background Removal Error:", err);
+                        processingState.classList.add('hidden');
+                        uploadContainer.classList.remove('hidden');
+                        showError("عذراً، تعذر إزالة خلفية هذه الصورة. يرجى تجربة صورة أخرى تحتوي على عنصر واضح.");
+                    }
+                }
+            }
+
+            makeApiCall();
+        }
+
+        // إنهاء المعالجة وعرض النتيجة
+        function finishProcessing(resultBase64) {
+            currentProcessedBase64 = resultBase64;
+            resultImgDisplay.src = resultBase64;
+            downloadBtn.href = resultBase64;
+
+            processingState.classList.add('hidden');
+            resultState.classList.remove('hidden');
+            setBgStyle('transparent');
+        }
+
+        // تغيير ألوان الخلفية في المعاينة
+        function setBgStyle(style) {
+            const transBtn = document.getElementById('bgTransBtn');
+            const whiteBtn = document.getElementById('bgWhiteBtn');
+            const blackBtn = document.getElementById('bgBlackBtn');
+
+            // إزالة الأنماط النشطة
+            [transBtn, whiteBtn, blackBtn].forEach(btn => {
+                btn.className = "px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition-all";
+            });
+
+            resultImgContainer.style.backgroundColor = "";
+
+            if (style === 'transparent') {
+                resultImgContainer.className = "bg-slate-950/80 rounded-2xl overflow-hidden border border-slate-700/50 h-[300px] flex items-center justify-center p-2 relative";
+                transBtn.className = "px-3 py-1.5 rounded-lg text-xs font-medium bg-brand-600 text-white transition-all";
+            } else if (style === 'white') {
+                resultImgContainer.className = "bg-white rounded-2xl overflow-hidden border border-slate-700/50 h-[300px] flex items-center justify-center p-2 relative";
+                whiteBtn.className = "px-3 py-1.5 rounded-lg text-xs font-medium bg-brand-600 text-white transition-all";
+            } else if (style === 'black') {
+                resultImgContainer.className = "bg-black rounded-2xl overflow-hidden border border-slate-700/50 h-[300px] flex items-center justify-center p-2 relative";
+                blackBtn.className = "px-3 py-1.5 rounded-lg text-xs font-medium bg-brand-600 text-white transition-all";
+            }
+        }
+
+        function setBgCustomColor(color) {
+            resultImgContainer.className = "rounded-2xl overflow-hidden border border-slate-700/50 h-[300px] flex items-center justify-center p-2 relative";
+            resultImgContainer.style.backgroundColor = color;
+        }
+
+        // إظهار وإخفاء أخطاء
+        function showError(msg) {
+            errorMessage.textContent = msg;
+            errorAlert.classList.remove('hidden');
+        }
+
+        function hideError() {
+            errorAlert.classList.add('hidden');
+        }
+
+        // إعادة ضبط التطبيق لرفع صورة جديدة
+        function resetApp() {
+            fileInput.value = '';
+            currentProcessedBase64 = null;
+            resultState.classList.add('hidden');
+            processingState.classList.add('hidden');
+            uploadContainer.classList.remove('hidden');
+            hideError();
+        }
+    </script>
+</body>
+</html>
